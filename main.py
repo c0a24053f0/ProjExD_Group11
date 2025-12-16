@@ -208,6 +208,11 @@ class Enemy(pg.sprite.Sprite):
         self.rect.move_ip(self.vx, self.vy)
 
 class Score:
+    """
+    スコア表示のクラス
+    ゲーム中のポイントを保持し、画面左下に表示する
+    value : 現在のスコア
+    """
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
@@ -221,6 +226,10 @@ class Score:
         screen.blit(self.image, self.rect)
 
 class Point(pg.sprite.Sprite):
+    """
+    ポイントアイテムのクラス
+    敵撃破時に確率で出現するポイントアイテムの管理
+    """
     def __init__(self, xy: tuple[int, int]):
         super().__init__()
         self.image = pg.transform.rotozoom(pg.image.load("fig/point.png"), 0, 0.1)
@@ -267,13 +276,13 @@ def main():
         for emy in pg.sprite.groupcollide(emys, beams, True, True).keys():  # ビームと衝突した敵機リスト
             exps.add(Explosion(emy, 100))  # 爆発エフェクト
             bird.change_img(6, screen)  # こうかとん喜びエフェクト
-            score.value += 10
+            score.value += 10  # 敵撃破時の獲得ポイント
 
-            if random.random() < 0.1:
+            if random.random() < 0.1:  # 敵撃破時のポイントアイテム出現確率
                 points.add(Point(emy.rect.center))
 
         if pg.sprite.spritecollide(bird, points, True):
-            score.value += 50
+            score.value += 50  # ポイントアイテム獲得時の獲得ポイント
         
         bird.update(key_lst, screen)
         beams.update()
