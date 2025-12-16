@@ -225,7 +225,6 @@ class Enemy(pg.sprite.Sprite):
         self.state = "down"  # 降下状態or停止状態
         self.interval = 20  # 爆弾投下インターバル
         self.bullet_img = __class__.bullet_img
-
     def update(self):
         """
         敵機を速度ベクトルself.vyに基づき移動（降下）させる
@@ -259,7 +258,7 @@ class Boss(Enemy):
         self.vx, self.vy = 0, +3
         self.bound = HEIGHT//4  # 停止位置
         self.state = "down"  # 降下状態or停止状態
-        self.interval = 30  # 爆弾投下インターバル
+        self.interval = 5  # 爆弾投下インターバル
 
         self.bullet_imgs = [pg.image.load("fig/bullet1.png")]
 
@@ -272,7 +271,23 @@ class Boss(Enemy):
         if self.rect.centery > self.bound:
             self.vy = 0
             self.state = "stop"
-        self.rect.move_ip(self.vx, self.vy)             
+        self.rect.move_ip(self.vx, self.vy)
+
+    def shoot(self, bird: Bird) -> Bullet:
+        """
+        敵機がこうかとんに向けて爆弾を放つ
+        引数 bird：こうかとん
+        戻り値：爆弾インスタンス
+        """
+        direction = calc_orientation(self.rect, bird.rect)
+        angle = math.degrees(math.atan2(-direction[1], direction[0]))
+        bullets = []
+        for delta_angle in [-20, 0, +20]:
+            rad = math.radians(angle + delta_angle)
+            dir_x = math.cos(rad)
+            dir_y = -math.sin(rad)
+            bullets.append(Bullet(self.bullet_imgs[0], (dir_x, dir_y), self.rect.center, 8))
+        return bullets   
 
 
 def main():
